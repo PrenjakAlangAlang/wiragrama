@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "447473778417",
+    "project_id": "wiragrama-23891",
+    "storage_bucket": "wiragrama-23891.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:447473778417:android:5b350ca4343cb20afa7350",
+        "android_client_info": {
+          "package_name": "com.wiragrama.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAN2Zto6V1NQIR3Ph7PMaJSOL9QYl1Uquo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
