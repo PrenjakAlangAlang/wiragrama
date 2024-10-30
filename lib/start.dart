@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:wiragrama/LoginRegistrasi/login.dart';
+import 'package:wiragrama/LoginRegistrasi/registrasi.dart';
 
 class Start extends StatefulWidget {
   const Start({super.key});
@@ -50,7 +52,8 @@ class _StartState extends State<Start> {
               // Get Started Button
               ElevatedButton(
                 onPressed: () {
-                  // Add your navigation or functionality here
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (context) => Registrasi()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1DB954),
@@ -82,7 +85,8 @@ class _StartState extends State<Start> {
                   ),
                   TextButton(
                     onPressed: () {
-                      // Add your navigation or functionality here
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => Login()));
                     },
                     child: const Text(
                       'Log in',

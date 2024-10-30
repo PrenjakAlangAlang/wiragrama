@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wiragrama/LoginRegistrasi/registrasi.dart';
 import 'package:wiragrama/home/home.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -13,6 +14,8 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
 
   @override
   Widget build(BuildContext context) {
@@ -155,7 +158,7 @@ class _LoginState extends State<Login> {
       child: Container(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: _loginWithGoogle,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF494A5F),
             shape: RoundedRectangleBorder(
@@ -172,8 +175,8 @@ class _LoginState extends State<Login> {
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
+                  children: const [
+                    Text(
                       'Continue with Google',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
@@ -189,7 +192,7 @@ class _LoginState extends State<Login> {
 
   Future<void> _loginUser() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await _auth.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
@@ -201,6 +204,32 @@ class _LoginState extends State<Login> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Login failed. Please try again.'),
+        ),
+      );
+    }
+  }
+
+  Future<void> _loginWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+      if (googleAuth != null) {
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        await _auth.signInWithCredential(credential);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Home()),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google login failed. Please try again.'),
         ),
       );
     }

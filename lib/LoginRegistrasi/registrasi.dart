@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+
+import 'package:wiragrama/LoginRegistrasi/login.dart';
 
 class Registrasi extends StatefulWidget {
   const Registrasi({super.key});
@@ -12,6 +18,21 @@ class _RegistrasiState extends State<Registrasi> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  File? _image; // Menyimpan gambar yang dipilih
+
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _image = File(image.path);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,6 +59,8 @@ class _RegistrasiState extends State<Registrasi> {
               ),
             ),
             const SizedBox(height: 20),
+            _profileImageField(), // Menambahkan widget input gambar profil
+            const SizedBox(height: 20),
             _usernameField(),
             const SizedBox(height: 20),
             _emailField(),
@@ -54,6 +77,24 @@ class _RegistrasiState extends State<Registrasi> {
             _registrasiButton(),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _profileImageField() {
+    return GestureDetector(
+      onTap: _pickImage, // Memanggil fungsi untuk memilih gambar
+      child: CircleAvatar(
+        radius: 50,
+        backgroundColor: Colors.grey[300],
+        backgroundImage: _image != null ? FileImage(_image!) : null,
+        child: _image == null
+            ? const Icon(
+                Icons.camera_alt,
+                color: Colors.white,
+                size: 40,
+              )
+            : null,
       ),
     );
   }
@@ -125,11 +166,27 @@ class _RegistrasiState extends State<Registrasi> {
       child: ElevatedButton(
         onPressed: () async {
           try {
-            await FirebaseAuth.instance.createUserWithEmailAndPassword(
+            UserCredential userCredential =
+                await _auth.createUserWithEmailAndPassword(
               email: emailController.text,
               password: passwordController.text,
             );
-            Navigator.pop(context); // Kembali setelah registrasi
+
+            // Simpan username dan foto profil ke Firestore
+            await _firestore
+                .collection('users')
+                .doc(userCredential.user!.uid)
+                .set({
+              'username': usernameController.text,
+              'email': emailController.text,
+              // Jika Anda menambahkan penyimpanan gambar, Anda bisa menyimpan URL di sini
+            });
+
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        Login())); // Kembali setelah registrasi
           } catch (e) {
             print(e);
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -159,7 +216,7 @@ class _RegistrasiState extends State<Registrasi> {
       child: Container(
         width: double.infinity,
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: _registerWithGoogle,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF494A5F),
             shape: RoundedRectangleBorder(
@@ -176,8 +233,8 @@ class _RegistrasiState extends State<Registrasi> {
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
+                  children: const [
+                    Text(
                       'Continue with Google',
                       style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
@@ -189,5 +246,37 @@ class _RegistrasiState extends State<Registrasi> {
         ),
       ),
     );
+  }
+
+  Future<void> _registerWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      if (googleAuth != null) {
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        UserCredential userCredential =
+            await _auth.signInWithCredential(credential);
+
+        // Simpan username dan email ke Firestore
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'username': usernameController.text,
+          'email': userCredential.user!.email,
+          // Jika Anda menambahkan penyimpanan gambar, Anda bisa menyimpan URL di sini
+        });
+
+        Navigator.pop(context); // Kembali setelah registrasi
+      }
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Google registration failed. Please try again.'),
+      ));
+    }
   }
 }

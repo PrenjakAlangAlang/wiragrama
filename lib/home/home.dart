@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -8,6 +9,16 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  User? user;
+
+  @override
+  void initState() {
+    super.initState();
+    // Mengambil data pengguna saat halaman dimuat
+    user = _auth.currentUser;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,16 +29,21 @@ class _HomeState extends State<Home> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage:
-                  AssetImage('assets/avatar.jpg'), // Ganti dengan gambar Anda
+              backgroundImage: user?.photoURL != null
+                  ? NetworkImage(
+                      user!.photoURL!) // Mengambil foto profil dari Firebase
+                  : AssetImage(
+                      'assets/avatar.jpg'), // Gambar default jika tidak ada
               radius: 20,
             ),
             SizedBox(width: 10),
-            Text(
-              'Hi, Luthfi Nurafiq',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+            Expanded(
+              child: Text(
+                'Hi, ${user?.displayName ?? 'User'}', // Menampilkan nama pengguna
+                style: TextStyle(color: Colors.white, fontSize: 18),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
-            Spacer(),
             Icon(
               Icons.settings,
               color: Colors.white,
@@ -52,9 +68,9 @@ class _HomeState extends State<Home> {
             Row(
               children: [
                 Expanded(
-                  flex: 1, // Lebar lebih besar untuk kotak Presensi
+                  flex: 1,
                   child: AspectRatio(
-                    aspectRatio: 1.5, // Menentukan rasio kotak Presensi
+                    aspectRatio: 1.5,
                     child: Container(
                       padding: EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -74,10 +90,9 @@ class _HomeState extends State<Home> {
                             ),
                           ),
                           Align(
-                            alignment: Alignment
-                                .centerRight, // Menempatkan gambar di sebelah kanan
+                            alignment: Alignment.centerRight,
                             child: Image.asset(
-                              'images/presensi.png', // Ganti dengan gambar Anda
+                              'images/presensi.png',
                               height: 70,
                             ),
                           ),
@@ -88,11 +103,11 @@ class _HomeState extends State<Home> {
                 ),
                 SizedBox(width: 8),
                 Expanded(
-                  flex: 1, // Lebar untuk kolom Kas dan Tabungan
+                  flex: 1,
                   child: Column(
                     children: [
                       AspectRatio(
-                        aspectRatio: 3.2, // Menentukan rasio untuk kotak Kas
+                        aspectRatio: 3.2,
                         child: Container(
                           padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -111,7 +126,7 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               Image.asset(
-                                'images/kas.png', // Ganti dengan gambar Anda
+                                'images/kas.png',
                                 height: 50,
                               ),
                             ],
@@ -120,8 +135,7 @@ class _HomeState extends State<Home> {
                       ),
                       SizedBox(height: 8),
                       AspectRatio(
-                        aspectRatio:
-                            3.2, // Menentukan rasio untuk kotak Tabungan
+                        aspectRatio: 3.2,
                         child: Container(
                           padding: EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -140,7 +154,7 @@ class _HomeState extends State<Home> {
                                 ),
                               ),
                               Image.asset(
-                                'images/tabungan.png', // Ganti dengan gambar Anda
+                                'images/tabungan.png',
                                 height: 50,
                               ),
                             ],
@@ -152,9 +166,7 @@ class _HomeState extends State<Home> {
                 ),
               ],
             ),
-
             SizedBox(height: 20),
-            // Pengumuman Section
             Text(
               'Pengumuman',
               style: TextStyle(
@@ -189,9 +201,7 @@ class _HomeState extends State<Home> {
                 ),
               ),
             ),
-
             SizedBox(height: 20),
-            // Informasi Section
             Text(
               'Informasi',
               style: TextStyle(
@@ -204,7 +214,7 @@ class _HomeState extends State<Home> {
               children: [
                 Expanded(
                   child: AspectRatio(
-                    aspectRatio: 1.5, // Tentukan rasio untuk kartu pertama
+                    aspectRatio: 1.5,
                     child: InfoCard(
                       title: 'Kas wiragrama',
                       subtitle: 'Anda sudah bayar',
@@ -215,7 +225,7 @@ class _HomeState extends State<Home> {
                 SizedBox(width: 10),
                 Expanded(
                   child: AspectRatio(
-                    aspectRatio: 1.5, // Tentukan rasio untuk kartu kedua
+                    aspectRatio: 1.5,
                     child: InfoCard(
                       title: 'Presensi',
                       subtitle: 'Anda sudah presensi',
@@ -243,37 +253,6 @@ class _HomeState extends State<Home> {
   }
 }
 
-class FeatureCard extends StatelessWidget {
-  final String title;
-  final Color color;
-  final IconData icon;
-
-  FeatureCard({required this.title, required this.color, required this.icon});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Column(
-          children: [
-            Icon(icon, color: Colors.white, size: 30),
-            SizedBox(height: 10),
-            Text(
-              title,
-              style: TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class InfoCard extends StatelessWidget {
   final String title;
   final String subtitle;
@@ -290,19 +269,17 @@ class InfoCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Menyusun teks rata kiri
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             title,
             style: TextStyle(color: Colors.white, fontSize: 16),
-            textAlign: TextAlign.left,
           ),
           SizedBox(height: 5),
           Text(
             subtitle,
             style: TextStyle(
                 color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-            textAlign: TextAlign.left,
           ),
         ],
       ),
