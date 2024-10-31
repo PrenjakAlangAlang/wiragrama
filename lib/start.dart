@@ -24,7 +24,7 @@ class _StartState extends State<Start> {
               const SizedBox(height: 30),
               Image.asset(
                 'images/wiragrama.png', // Ensure this path is correct
-                height: 150,
+                height: 200,
               ),
               const SizedBox(height: 0),
 
