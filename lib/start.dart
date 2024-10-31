@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:wiragrama/LoginRegistrasi/login.dart';
 import 'package:wiragrama/LoginRegistrasi/registrasi.dart';
+import 'package:wiragrama/authpage.dart';
 
 class Start extends StatefulWidget {
   const Start({super.key});
@@ -52,8 +52,8 @@ class _StartState extends State<Start> {
               // Get Started Button
               ElevatedButton(
                 onPressed: () {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => Registrasi()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Authpage()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF1DB954),
@@ -78,18 +78,20 @@ class _StartState extends State<Start> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Already have an account? ',
+                    "Don't have an account yet?",
                     style: TextStyle(
                       color: Colors.white,
                     ),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => Login()));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Registrasi()));
                     },
                     child: const Text(
-                      'Log in',
+                      'Register',
                       style: TextStyle(
                         color:
                             Colors.white, // You can change the color if needed

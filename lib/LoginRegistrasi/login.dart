@@ -212,7 +212,8 @@ class _LoginState extends State<Login> {
   Future<void> _loginWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
 
       if (googleAuth != null) {
         final credential = GoogleAuthProvider.credential(

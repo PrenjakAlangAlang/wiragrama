@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:wiragrama/start.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -15,7 +16,6 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    // Mengambil data pengguna saat halaman dimuat
     user = _auth.currentUser;
   }
 
@@ -30,23 +30,27 @@ class _HomeState extends State<Home> {
           children: [
             CircleAvatar(
               backgroundImage: user?.photoURL != null
-                  ? NetworkImage(
-                      user!.photoURL!) // Mengambil foto profil dari Firebase
-                  : AssetImage(
-                      'assets/avatar.jpg'), // Gambar default jika tidak ada
+                  ? NetworkImage(user!.photoURL!)
+                  : AssetImage('images/wiragrama.png'),
               radius: 20,
             ),
             SizedBox(width: 10),
             Expanded(
               child: Text(
-                'Hi, ${user?.displayName ?? 'User'}', // Menampilkan nama pengguna
+                'Hi, ${user?.displayName ?? 'User'}',
                 style: TextStyle(color: Colors.white, fontSize: 18),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            Icon(
-              Icons.settings,
-              color: Colors.white,
+            IconButton(
+              icon: Icon(Icons.settings, color: Colors.white),
+              onPressed: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Start()),
+                );
+              },
             ),
           ],
         ),
@@ -56,7 +60,7 @@ class _HomeState extends State<Home> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 20),
+            SizedBox(height: 5),
             Text(
               'Make the most of it!',
               style: TextStyle(
@@ -93,7 +97,7 @@ class _HomeState extends State<Home> {
                             alignment: Alignment.centerRight,
                             child: Image.asset(
                               'images/presensi.png',
-                              height: 70,
+                              height: 50,
                             ),
                           ),
                         ],
@@ -273,13 +277,13 @@ class InfoCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(color: Colors.white, fontSize: 16),
+            style: TextStyle(color: Colors.white, fontSize: 14),
           ),
           SizedBox(height: 5),
           Text(
             subtitle,
             style: TextStyle(
-                color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),

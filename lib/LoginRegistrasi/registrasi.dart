@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
 import 'package:wiragrama/LoginRegistrasi/login.dart';
 
 class Registrasi extends StatefulWidget {
@@ -21,7 +20,7 @@ class _RegistrasiState extends State<Registrasi> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  File? _image; // Menyimpan gambar yang dipilih
+  File? _image;
 
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
@@ -43,23 +42,15 @@ class _RegistrasiState extends State<Registrasi> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset('images/wiragrama.png', height: 200),
-            const Text(
-              "Please register",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const Text(
-              "Fill in your email and password correctly!",
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.white,
-              ),
-            ),
+            const Text("Please register",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
+            const Text("Fill in your email and password correctly!",
+                style: TextStyle(fontSize: 15, color: Colors.white)),
             const SizedBox(height: 20),
-            _profileImageField(), // Menambahkan widget input gambar profil
+            _profileImageField(),
             const SizedBox(height: 20),
             _usernameField(),
             const SizedBox(height: 20),
@@ -67,10 +58,7 @@ class _RegistrasiState extends State<Registrasi> {
             const SizedBox(height: 14),
             _passwordField(),
             const SizedBox(height: 14),
-            const Text(
-              'Or',
-              style: TextStyle(color: Colors.white),
-            ),
+            const Text('Or', style: TextStyle(color: Colors.white)),
             const SizedBox(height: 14),
             _googleButton(),
             const SizedBox(height: 14),
@@ -83,17 +71,13 @@ class _RegistrasiState extends State<Registrasi> {
 
   Widget _profileImageField() {
     return GestureDetector(
-      onTap: _pickImage, // Memanggil fungsi untuk memilih gambar
+      onTap: _pickImage,
       child: CircleAvatar(
-        radius: 50,
+        radius: 25,
         backgroundColor: Colors.grey[300],
         backgroundImage: _image != null ? FileImage(_image!) : null,
         child: _image == null
-            ? const Icon(
-                Icons.camera_alt,
-                color: Colors.white,
-                size: 40,
-              )
+            ? const Icon(Icons.camera_alt, color: Colors.white, size: 40)
             : null,
       ),
     );
@@ -110,9 +94,7 @@ class _RegistrasiState extends State<Registrasi> {
             hintText: 'Username',
             filled: true,
             fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
           ),
         ),
       ),
@@ -130,9 +112,7 @@ class _RegistrasiState extends State<Registrasi> {
             hintText: 'Email',
             filled: true,
             fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
           ),
         ),
       ),
@@ -151,9 +131,7 @@ class _RegistrasiState extends State<Registrasi> {
             hintText: 'Password',
             filled: true,
             fillColor: Colors.white,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
           ),
         ),
       ),
@@ -172,25 +150,22 @@ class _RegistrasiState extends State<Registrasi> {
               password: passwordController.text,
             );
 
-            // Simpan username dan foto profil ke Firestore
             await _firestore
                 .collection('users')
                 .doc(userCredential.user!.uid)
                 .set({
               'username': usernameController.text,
               'email': emailController.text,
-              // Jika Anda menambahkan penyimpanan gambar, Anda bisa menyimpan URL di sini
             });
 
             Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        Login())); // Kembali setelah registrasi
+              context,
+              MaterialPageRoute(builder: (context) => const Login()),
+            );
           } catch (e) {
-            print(e);
+            print('Error: $e'); // Debugging
             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Registrasi gagal. Harap coba lagi.'),
+              content: Text('Registrasi gagal: ${e.toString()}'),
             ));
           }
         },
@@ -201,9 +176,8 @@ class _RegistrasiState extends State<Registrasi> {
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF1DB954),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           minimumSize: const Size.fromHeight(50),
         ),
       ),
@@ -219,25 +193,19 @@ class _RegistrasiState extends State<Registrasi> {
           onPressed: _registerWithGoogle,
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF494A5F),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
             minimumSize: const Size.fromHeight(50),
           ),
           child: Row(
             children: [
-              Image.asset(
-                'images/google.png',
-                width: 24,
-              ),
+              Image.asset('images/google.png', width: 24),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Text(
-                      'Continue with Google',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+                    Text('Continue with Google',
+                        style: TextStyle(fontSize: 16, color: Colors.white)),
                   ],
                 ),
               )
@@ -263,17 +231,18 @@ class _RegistrasiState extends State<Registrasi> {
         UserCredential userCredential =
             await _auth.signInWithCredential(credential);
 
-        // Simpan username dan email ke Firestore
         await _firestore.collection('users').doc(userCredential.user!.uid).set({
           'username': usernameController.text,
           'email': userCredential.user!.email,
-          // Jika Anda menambahkan penyimpanan gambar, Anda bisa menyimpan URL di sini
         });
 
-        Navigator.pop(context); // Kembali setelah registrasi
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const Login()),
+        );
       }
     } catch (e) {
-      print(e);
+      print('Error: $e'); // Debugging
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Google registration failed. Please try again.'),
       ));
